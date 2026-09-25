@@ -1,0 +1,48 @@
+name: Setup axx
+description: Install axx, the human-readable acceptance testing framework (github.com/nimbusxr/axx), and add it to PATH.
+author: NimbusXR
+branding:
+  icon: check-square
+  color: green
+
+inputs:
+  version:
+    description: "Version to install: a version like 0.1.0, 'latest' (newest release, pre-releases included), or 'nightly'."
+    default: latest
+  token:
+    description: GitHub token used to query releases (avoids API rate limits).
+    default: ${{ github.token }}
+
+outputs:
+  version:
+    description: The installed version.
+    value: ${{ steps.version.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install axx (Linux/macOS)
+      if: runner.os != 'Windows'
+      shell: bash
+      env:
+        AXX_VERSION: ${{ inputs.version != 'latest' && inputs.version || '' }}
+        GITHUB_TOKEN: ${{ inputs.token }}
+        AXX_INSTALL_DIR: ${{ runner.tool_cache }}/axx/bin
+      run: |
+        sh "$GITHUB_ACTION_PATH/install.sh"
+        echo "$AXX_INSTALL_DIR" >> "$GITHUB_PATH"
+    - name: Install axx (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      env:
+        AXX_VERSION: ${{ inputs.version != 'latest' && inputs.version || '' }}
+        GITHUB_TOKEN: ${{ inputs.token }}
+        AXX_INSTALL_DIR: ${{ runner.tool_cache }}\axx\bin
+      run: |
+        & "$env:GITHUB_ACTION_PATH/install.ps1"
+        Add-Content -Path $env:GITHUB_PATH -Value $env:AXX_INSTALL_DIR
+    - id: version
+      shell: bash
+      run: |
+        v=$(axx version --json | sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' | head -n 1)
+        echo "version=$v" >> "$GITHUB_OUTPUT"
