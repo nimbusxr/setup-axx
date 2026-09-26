@@ -4,7 +4,7 @@ Installs [axx](https://github.com/nimbusxr/axx), the human-readable acceptance t
 for the agentic era, in GitHub Actions on Linux, macOS and Windows, and adds it to `PATH`.
 
 ```yaml
-- uses: nimbusxr/setup-axx@v1
+- uses: nimbusxr/setup-axx@v0
   with:
     version: latest   # or a version such as 0.1.0, or nightly
 - run: axx run --format junit:build/axx/junit.xml
@@ -15,7 +15,8 @@ for the agentic era, in GitHub Actions on Linux, macOS and Windows, and adds it 
 | `version` | `latest` | A version such as `0.1.0`, `latest` (the newest release, pre-releases included) or `nightly`. |
 | `token` | `${{ github.token }}` | The token used to list releases, which avoids API rate limits. |
 
-The installed version is the `version` output.
+The installed version is the `version` output. `v0` follows the action's `0.x` releases while
+axx is in beta.
 
 The action downloads the release archive for the runner's OS and architecture and checks it
 against the release's `checksums.txt`. Every `0.x` release of axx is a GitHub pre-release, so
